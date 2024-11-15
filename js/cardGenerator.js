@@ -1,187 +1,233 @@
-// Build HTML fetching info from cardInfo.js
-function generateEvent(container, date, title, tags, summary, eventLink, recordingLink) {
-	var cardSection = document.createElement("div");
-	cardSection.classList.add("card-section");
+function generateEvent(container, date, title, summary, eventLink, recordingLink, tags, gerundio) {
 
-	var hiddenDate = document.createElement("input");
-	hiddenDate.setAttribute("type", "hidden");
-	hiddenDate.setAttribute("value", date);
-	cardSection.appendChild(hiddenDate);
+	// Create card row and set attributes
+	const cardRow = createElementWithClasses("div", "card-row");
+	cardRow.setAttribute("data-tags", tags.join(","));
+	cardRow.setAttribute("gerundio-tags", gerundio);
 
-	var cardDate = document.createElement("div");
-	cardDate.classList.add("card-date");
+	// Hidden date input
+	const hiddenDate = document.createElement("input");
+	hiddenDate.type = "hidden";
+	hiddenDate.value = date;
+	cardRow.appendChild(hiddenDate);
 
-	var dateDay = document.createElement("div");
-	dateDay.classList.add("card-day");
-	dateDay.textContent = date.split("-")[2];
-	var dateMonth = document.createElement("div");
-	dateMonth.classList.add("card-month");
-	dateMonth.textContent = date.split("-")[1];
-	cardDate.appendChild(dateDay);
-	cardDate.appendChild(dateMonth);
+	// Card date and card main content
+	const cardDate = createCardDate(date);
+	const cardMain = createElementWithClasses("div", "card-main");
+	appendAnimations(cardMain);
 
-	var cardMain = document.createElement("div");
-	cardMain.classList.add("card-main");
+	// Card info section
+	const cardInfo = createElementWithClasses("div", "card-info");
+	cardInfo.appendChild(createCardTitle(title));
+	cardInfo.appendChild(createCardSummary(summary));
+	cardInfo.appendChild(createTagDiv(tags, gerundio));
+	cardMain.appendChild(cardInfo);
 
-	var animRight = document.createElement("span");
-	animRight.classList.add("animRight")
-	var animDown = document.createElement("span");
-	animDown.classList.add("animDown")
-	var animLeft = document.createElement("span");
-	animLeft.classList.add("animLeft")
-	var animUp = document.createElement("span");
-	animUp.classList.add("animUp")
-	cardMain.appendChild(animRight);
-	cardMain.appendChild(animDown);
-	cardMain.appendChild(animLeft);
-	cardMain.appendChild(animUp);
+	// Card aside section
+	const cardAside = createElementWithClasses("div", "card-aside");
+	cardAside.appendChild(createPortrait(summary));
+	cardAside.appendChild(createLinkButton(date, eventLink, recordingLink));
+	cardMain.appendChild(cardAside);
 
-	var cardInfo = document.createElement("div");
-	cardInfo.classList.add("card-block", "card-info");
+	// Add event class by date
+	styleEventByDate(cardRow, cardMain, date);
 
-	var cardTitle = document.createElement("div");
-	cardTitle.classList.add("card-title");
-	var titleText = document.createElement("h3");
-	titleText.textContent = title;
-	cardTitle.appendChild(titleText);
-	var cardTags = document.createElement("div");
-	cardTags.classList.add("card-tags");
-	/*cardTags.textContent = tags;*/
+	// Append content to row and insert event in container
+	cardRow.appendChild(cardDate);
+	cardRow.appendChild(cardMain);
+	insertEventInOrder(container, cardRow, new Date(date));
+}
 
-		// Dummy tags
-		var cardTag1 = document.createElement("div");
-		cardTag1.classList.add("tag", "codando");
-		cardTag1.textContent = "Codando";
-		var cardTag2 = document.createElement("div");
-		cardTag2.classList.add("tag", "comunicando");
-		cardTag2.textContent = "Comunicando";
-		var cardTag3 = document.createElement("div");
-		cardTag3.classList.add("tag", "cuidando");
-		cardTag3.textContent = "Cuidando";
-		var cardTag4 = document.createElement("div");
-		cardTag4.classList.add("tag", "desembolando");
-		cardTag4.textContent = "Desembolando";
-		var cardTag5 = document.createElement("div");
-		cardTag5.classList.add("tag", "endireitando");
-		cardTag5.textContent = "Endireitando";
-		var cardTag6 = document.createElement("div");
-		cardTag6.classList.add("tag", "engenheirando");
-		cardTag6.textContent = "Engenheirando";
-		var cardTag7 = document.createElement("div");
-		cardTag7.classList.add("tag", "ensinando");
-		cardTag7.textContent = "Ensinando";
-		var cardTag8 = document.createElement("div");
-		cardTag8.classList.add("tag", "negociando");
-		cardTag8.textContent = "Negociando";
-		var cardTag9 = document.createElement("div");
-		cardTag9.classList.add("tag", "projetando");
-		cardTag9.textContent = "Projetando";
-		var cardTag10 = document.createElement("div");
-		cardTag10.classList.add("tag", "veterinando");
-		cardTag10.textContent = "Veterinando";
-		cardTags.appendChild(cardTag1);
-		cardTags.appendChild(cardTag2);
-		cardTags.appendChild(cardTag3);
-		cardTags.appendChild(cardTag4);
-		cardTags.appendChild(cardTag5);
-		cardTags.appendChild(cardTag6);
-		cardTags.appendChild(cardTag7);
-		cardTags.appendChild(cardTag8);
-		cardTags.appendChild(cardTag9);
-		cardTags.appendChild(cardTag10);
+function createElementWithClasses(tag, ...classes) {
+	const element = document.createElement(tag);
+	element.classList.add(...classes);
 
-	cardInfo.appendChild(cardTitle);
-	cardInfo.appendChild(cardTags);
+	return element;
+}
 
-	var cardAside = document.createElement("div");
-	cardAside.classList.add("card-block", "card-aside");
+function createCardDate(date) {
+	const cardDate = createElementWithClasses("div", "card-date");
 
-	var guestPortrait = document.createElement("div");
-	guestPortrait.classList.add("portrait");
+	// Extract day and month
+	const [year, month, day] = date.split("-");
 
-	// Normalize vowels
+	const dayElement = createElementWithClasses("div", "card-day");
+	dayElement.textContent = day;
+	cardDate.appendChild(dayElement);
+
+	const monthElement = createElementWithClasses("div", "card-month");
+	monthElement.textContent = month;
+	cardDate.appendChild(monthElement);
+
+	return cardDate;
+}
+
+function appendAnimations(container) {
+	const fragment = document.createDocumentFragment();
+	["anim-right", "anim-bottom", "anim-left", "anim-top"].forEach(anim => {
+		// Minimize reflows by appending all spans to a temporary container first
+		fragment.appendChild(createElementWithClasses("span", anim));
+	});
+	container.appendChild(fragment);
+}
+
+function createCardTitle(title) {
+	const cardTitle = createElementWithClasses("h2", "card-title");
+	cardTitle.textContent = title;
+
+	return cardTitle;
+}
+
+function createCardSummary(summary) {
+	const cardSummary = createElementWithClasses("div", "card-summary");
+	const summaryText = createElementWithClasses("p", "summary-text");
+	summaryText.textContent = summary;
+
+	const summaryExpand = createElementWithClasses("button", "card-button", "summary-expand");
+	summaryExpand.textContent = "Ler mais";
+	summaryExpand.onclick = () => {
+		summaryText.style.webkitLineClamp = "none";
+		summaryExpand.style.visibility = "hidden";
+	};
+	cardSummary.appendChild(summaryText);
+	cardSummary.appendChild(summaryExpand);
+
+	return cardSummary;
+}
+
+function createTagDiv(tags, gerundio) {
+	const tagDiv = createElementWithClasses("div", "card-tags");
+	tags.forEach(tag => {
+		const tagText = createElementWithClasses("span", "tag", gerundio.toLowerCase());
+		tagText.textContent = tag;
+		tagDiv.appendChild(tagText);
+	});
+
+	return tagDiv;
+}
+
+// Set portrait image path by matching filename with guest name and surname extracted from the card summary beginning
+// E.g. "John Doe, renowned professor at..." => Path must be "img/portrait/john_doe"
+// File extension must be .jpeg
+function createPortrait(summary) {
+	// Remove accents from guest name
 	function removeDiacritics(str) {
 		return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 	}
 
-	// Set portrait image path by matching filename with guest's name and surname extracted from the card summary
-	// E.g. "John Doe, renowned professor at..." => Path must be "img/portrait/john_doe"
-	// Extension must be .JPEG
-	var guestName = summary.split(/[ ,]/).slice(0, 2).join("_");
-	guestName = removeDiacritics(guestName).toLowerCase();
-	var portraitSrc = ("url(img/portrait/") + guestName + (".jpeg");
-	guestPortrait.style.backgroundImage = portraitSrc;
+	const portrait = createElementWithClasses("div", "portrait");
+	const guestName = removeDiacritics(summary.split(/[\s,]+/).slice(0, 2).join("_")).toLowerCase();
+	portrait.style.backgroundImage = `url(img/portrait/${guestName}.jpeg)`;
 
-	var linkButton = document.createElement("a");
-	var eventDate = new Date(date).setUTCHours(0, 0, 0, 0);
-	var currentDate = new Date().setUTCHours(0, 0, 0, 0);
-
-	if (eventDate >= currentDate) {
-		linkButton.classList.add("card-button", "button-event");
-		linkButton.href = eventLink;
-		linkButton.textContent = "Acessar";
-	} else {
-		linkButton.classList.add("card-button", "button-recording");
-		linkButton.href = recordingLink;
-		linkButton.textContent = "Gravação";
-	}
-
-	cardAside.appendChild(guestPortrait);
-	cardAside.appendChild(linkButton);
-
-	var cardSummary = document.createElement("details");
-	cardSummary.classList.add("card-block", "card-summary");
-
-	var summaryHeader = document.createElement("summary");
-
-	var summaryHeaderText = document.createElement("span");
-	summaryHeaderText.textContent = "Descrição";
-
-	var summaryContainer = document.createElement("div");
-	var summaryText = document.createElement("p");
-	summaryText.textContent = summary;
-
-	summaryHeader.appendChild(summaryHeaderText);
-	summaryContainer.appendChild(summaryText);
-	cardSummary.appendChild(summaryHeader);
-	cardSummary.appendChild(summaryContainer);
-
-	cardMain.appendChild(cardInfo);
-	cardMain.appendChild(cardAside);
-	cardMain.appendChild(cardSummary);
-
-	if (eventDate < currentDate) {
-		cardSection.classList.add("finished-event");
-	} else if (eventDate === currentDate) {
-		cardMain.classList.add("current-event");
-	}
-
-	cardSection.appendChild(cardDate);
-	cardSection.appendChild(cardMain);
-
-	insertEventsInOrder(container, cardSection, eventDate);
+	return portrait;
 }
 
-// Order events chronologically, highest at the top
-function insertEventsInOrder(container, newEvent) {
-	var events = container.querySelectorAll(".card-section");
+function normalizeDate(date) {
+	let normalizedDate = new Date(date);
+
+	// Check if string without time component
+	if (typeof date === "string" && !date.includes("T")) {
+		// Append time part to ensure local time parsing
+		normalizedDate = new Date(date + "T00:00:00");
+	}
+	normalizedDate.setHours(0, 0, 0, 0);
+
+	return normalizedDate;
+}
+
+function createLinkButton(date, eventLink, recordingLink) {
+	const eventDate = normalizeDate(date);
+	const currentDate = normalizeDate(new Date());
+
+	const linkButton = document.createElement("a");
+	const isEventUpcoming = eventDate >= currentDate;
+
+	linkButton.classList.add("card-button", isEventUpcoming ? "button-event" : "button-recording");
+	linkButton.href = isEventUpcoming ? eventLink : recordingLink;
+	linkButton.textContent = isEventUpcoming ? "Acessar" : "Gravação";
+
+	return linkButton;
+}
+
+function styleEventByDate(cardRow, cardMain, date) {
+	const eventDate = normalizeDate(date);
+	const currentDate = normalizeDate(new Date());
+
+	if (eventDate < currentDate) {
+		cardRow.classList.add("finished-event");
+	} else if (eventDate.getTime() === currentDate.getTime()) {
+		cardMain.classList.add("current-event");
+	}
+}
+
+function insertEventInOrder(container, newEvent, newEventDate) {
+	const events = container.querySelectorAll(".card-row");
 
 	if (events.length === 0) {
 		container.appendChild(newEvent);
+
 		return;
 	}
 
-	var newEventDate = new Date(newEvent.querySelector("input[type='hidden']").value);
-
-	for (var i = events.length - 1; i >= 0; i--) {
-		var currentEvent = events[i];
-		var currentEventDate = new Date(currentEvent.querySelector("input[type='hidden']").value);
+	for (let i = events.length - 1; i >= 0; i--) {
+		const currentEvent = events[i];
+		const currentEventDate = new Date(currentEvent.querySelector("input[type='hidden']").value);
 
 		if (newEventDate < currentEventDate) {
 			container.insertBefore(newEvent, currentEvent.nextSibling);
+
 			return;
 		}
 	}
-
 	container.insertBefore(newEvent, container.firstChild);
 }
+
+function populateComboBox(container) {
+	const events = container.querySelectorAll(".card-row");
+	const tagsSet = new Set();
+	const gerundioTagsSet = new Set();
+
+	events.forEach(event => {
+		const tags = event.getAttribute("data-tags");
+		const gerundioTags = event.getAttribute("gerundio-tags");
+
+		if (tags) tags.split(",").forEach(tag => tagsSet.add(tag.trim()));
+		if (gerundioTags) gerundioTags.split(",").forEach(tag => gerundioTagsSet.add(tag.trim()));
+	});
+
+	// Populate combo box
+	const combinedComboBox = document.getElementById("combined-filter");
+	const tagsOptGroup = createOptGroup("Áreas", tagsSet);
+	const gerundioOptGroup = createOptGroup("Gerúndios", gerundioTagsSet);
+
+	combinedComboBox.appendChild(tagsOptGroup);
+	combinedComboBox.appendChild(gerundioOptGroup);
+}
+
+function createOptGroup(label, tagsSet) {
+	const optGroup = document.createElement("optgroup");
+	optGroup.label = label;
+	tagsSet.forEach(tag => {
+		const option = document.createElement("option");
+		option.text = tag;
+		optGroup.appendChild(option);
+	});
+
+	return optGroup;
+}
+
+function filterEvents() {
+	const selectedValue = document.getElementById("combined-filter").value;
+	const events = document.querySelectorAll(".card");
+
+	// Display events based on selected filter
+	events.forEach(event => {
+		const eventTags = event.getAttribute("data-tags").split(",");
+		const eventGerundioTags = event.getAttribute("gerundio-tags").split(",");
+
+		const displayEvent = (eventTags.includes(selectedValue) || eventGerundioTags.includes(selectedValue) || selectedValue === "All");
+		event.style.display = displayEvent ? "flex" : "none";
+	});
+}
+
+document.getElementById("combined-filter").addEventListener("change", filterEvents);
