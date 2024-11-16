@@ -1,5 +1,5 @@
 // Build HTML fetching info from cardInfo.js
-function generateEvent(container, title, summary, date, eventLink, recordingLink) {
+function generateEvent(container, date, title, tags, summary, eventLink, recordingLink) {
 	var cardSection = document.createElement("div");
 	cardSection.classList.add("card-section");
 
@@ -39,14 +39,59 @@ function generateEvent(container, title, summary, date, eventLink, recordingLink
 	var cardInfo = document.createElement("div");
 	cardInfo.classList.add("card-block", "card-info");
 
-	var cardTitle = document.createElement("h3");
+	var cardTitle = document.createElement("div");
 	cardTitle.classList.add("card-title");
-	cardTitle.textContent = title;
-	var cardSummary = document.createElement("p");
-	cardSummary.classList.add("card-summary");
-	cardSummary.textContent = summary;
+	var titleText = document.createElement("h3");
+	titleText.textContent = title;
+	cardTitle.appendChild(titleText);
+	var cardTags = document.createElement("div");
+	cardTags.classList.add("card-tags");
+	/*cardTags.textContent = tags;*/
+
+		// Dummy tags
+		var cardTag1 = document.createElement("div");
+		cardTag1.classList.add("tag", "codando");
+		cardTag1.textContent = "Codando";
+		var cardTag2 = document.createElement("div");
+		cardTag2.classList.add("tag", "comunicando");
+		cardTag2.textContent = "Comunicando";
+		var cardTag3 = document.createElement("div");
+		cardTag3.classList.add("tag", "cuidando");
+		cardTag3.textContent = "Cuidando";
+		var cardTag4 = document.createElement("div");
+		cardTag4.classList.add("tag", "desembolando");
+		cardTag4.textContent = "Desembolando";
+		var cardTag5 = document.createElement("div");
+		cardTag5.classList.add("tag", "endireitando");
+		cardTag5.textContent = "Endireitando";
+		var cardTag6 = document.createElement("div");
+		cardTag6.classList.add("tag", "engenheirando");
+		cardTag6.textContent = "Engenheirando";
+		var cardTag7 = document.createElement("div");
+		cardTag7.classList.add("tag", "ensinando");
+		cardTag7.textContent = "Ensinando";
+		var cardTag8 = document.createElement("div");
+		cardTag8.classList.add("tag", "negociando");
+		cardTag8.textContent = "Negociando";
+		var cardTag9 = document.createElement("div");
+		cardTag9.classList.add("tag", "projetando");
+		cardTag9.textContent = "Projetando";
+		var cardTag10 = document.createElement("div");
+		cardTag10.classList.add("tag", "veterinando");
+		cardTag10.textContent = "Veterinando";
+		cardTags.appendChild(cardTag1);
+		cardTags.appendChild(cardTag2);
+		cardTags.appendChild(cardTag3);
+		cardTags.appendChild(cardTag4);
+		cardTags.appendChild(cardTag5);
+		cardTags.appendChild(cardTag6);
+		cardTags.appendChild(cardTag7);
+		cardTags.appendChild(cardTag8);
+		cardTags.appendChild(cardTag9);
+		cardTags.appendChild(cardTag10);
+
 	cardInfo.appendChild(cardTitle);
-	cardInfo.appendChild(cardSummary);
+	cardInfo.appendChild(cardTags);
 
 	var cardAside = document.createElement("div");
 	cardAside.classList.add("card-block", "card-aside");
@@ -84,65 +129,26 @@ function generateEvent(container, title, summary, date, eventLink, recordingLink
 	cardAside.appendChild(guestPortrait);
 	cardAside.appendChild(linkButton);
 
-	var cardAudience = document.createElement("details");
-	cardAudience.classList.add("card-block", "card-audience");
+	var cardSummary = document.createElement("details");
+	cardSummary.classList.add("card-block", "card-summary");
 
-	var audienceHeader = document.createElement("summary");
-	var audienceHeaderText = document.createElement("span");
-	audienceHeaderText.textContent = "Público-alvo";
-	audienceHeader.appendChild(audienceHeaderText);
+	var summaryHeader = document.createElement("summary");
 
-	var tagsContainer = document.createElement("div");
-	tagsContainer.classList.add("card-tags");
+	var summaryHeaderText = document.createElement("span");
+	summaryHeaderText.textContent = "Descrição";
 
-		// Dummy tags
-		var cardTag1 = document.createElement("div");
-		cardTag1.classList.add("tag", "codando");
-		cardTag1.textContent = "Codando";
-		var cardTag2 = document.createElement("div");
-		cardTag2.classList.add("tag", "comunicando");
-		cardTag2.textContent = "Comunicando";
-		var cardTag3 = document.createElement("div");
-		cardTag3.classList.add("tag", "cuidando");
-		cardTag3.textContent = "Cuidando";
-		var cardTag4 = document.createElement("div");
-		cardTag4.classList.add("tag", "desembolando");
-		cardTag4.textContent = "Desembolando";
-		var cardTag5 = document.createElement("div");
-		cardTag5.classList.add("tag", "endireitando");
-		cardTag5.textContent = "Endireitando";
-		var cardTag6 = document.createElement("div");
-		cardTag6.classList.add("tag", "engenheirando");
-		cardTag6.textContent = "Engenheirando";
-		var cardTag7 = document.createElement("div");
-		cardTag7.classList.add("tag", "ensinando");
-		cardTag7.textContent = "Ensinando";
-		var cardTag8 = document.createElement("div");
-		cardTag8.classList.add("tag", "negociando");
-		cardTag8.textContent = "Negociando";
-		var cardTag9 = document.createElement("div");
-		cardTag9.classList.add("tag", "projetando");
-		cardTag9.textContent = "Projetando";
-		var cardTag10 = document.createElement("div");
-		cardTag10.classList.add("tag", "veterinando");
-		cardTag10.textContent = "Veterinando";
-		tagsContainer.appendChild(cardTag1);
-		tagsContainer.appendChild(cardTag2);
-		tagsContainer.appendChild(cardTag3);
-		tagsContainer.appendChild(cardTag4);
-		tagsContainer.appendChild(cardTag5);
-		tagsContainer.appendChild(cardTag6);
-		tagsContainer.appendChild(cardTag7);
-		tagsContainer.appendChild(cardTag8);
-		tagsContainer.appendChild(cardTag9);
-		tagsContainer.appendChild(cardTag10);
+	var summaryContainer = document.createElement("div");
+	var summaryText = document.createElement("p");
+	summaryText.textContent = summary;
 
-	cardAudience.appendChild(audienceHeader);
-	cardAudience.appendChild(tagsContainer);
+	summaryHeader.appendChild(summaryHeaderText);
+	summaryContainer.appendChild(summaryText);
+	cardSummary.appendChild(summaryHeader);
+	cardSummary.appendChild(summaryContainer);
 
 	cardMain.appendChild(cardInfo);
 	cardMain.appendChild(cardAside);
-	cardMain.appendChild(cardAudience);
+	cardMain.appendChild(cardSummary);
 
 	if (eventDate < currentDate) {
 		cardSection.classList.add("finished-event");

@@ -93,7 +93,7 @@
 	grid-template-areas:
 		"info side"
 		"info side"
-		"audi audi";
+		"summ summ";
 	width: 100%;
 }
 
@@ -119,9 +119,21 @@
 	align-items: center;
 }
 
-.card-audience {
-	grid-area: audi;
+.card-summary {
+	grid-area: summ;
+	display: none;
 	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.card-summary > * {
+	transform: translateY(-10px);
+}
+
+@media (width >= 600px) {
+	.card-summary {
+		display: block;
+	}
 }
 
 @media (width >= 600px) {
@@ -130,9 +142,6 @@
 	}
 	.card-info {
 		padding-bottom: 20px;
-	}
-	.card-aside {
-		padding-top: 20px;
 	}
 }
 
@@ -153,126 +162,9 @@
 	/*text-transform: capitalize;*/
 }
 
-.card-summary {
-	display: none;
-}
-
-@media (width >= 400px) {
-	.card-title {
-		font-size: 20px;
-	}
-}
-
-@media (width >= 600px) {
-	.card-title {
-		text-align: left;
-		text-wrap: wrap;
-	}
-	.card-summary {
-		display: block;
-		color: #aaa;
-		text-align: justify;
-		text-justify: inter-word;
-	}
-}
-
-
-/* ---- Aside ---- */
-.portrait {
-	width: 120px;
-	height: 120px;
-	margin-bottom: 20px;
-	background: #ccc center 20%/120px no-repeat;
-	border-radius: 50%;
-	border: 2px solid var(--accent-light);
-}
-
-.card-button {
-	padding: 20px 30px;
-	border: none;
-	border-radius: 22px;
-	color: black;
-	font-weight: bold;
-	text-decoration: none;
-	line-height: 4px;
-	transition: transform 0.2s;
-}
-
-.card-button:hover {
-	color: white;
-}
-
-.card-button:active {
-	outline: 0;
-	transform: scale(0.95);
-}
-
-.button-event {
-	background-color: var(--accent-light);
-}
-
-.button-recording {
-	background-color: #aaa;
-}
-
-.button-recording:hover {
-	background-color: var(--accent-light);
-}
-
-@media (width >= 600px) {
-	.card-button {
-		min-width: unset;
-	}
-}
-
-
-/* ---- Audience ---- */
-details {
-	background-color: #303030;
-	color: white;
-	font-size: 1.5rem;
-}
-
-summary {
-	display: flex;
-	padding: 0.5em 1.3rem;
-	color: white;
-	font-weight: bold;
-	cursor: pointer;
-}
-
-summary::before {
-	content: "\2B9E";
-	display: inline-block;
-	margin-right: 10px;
-	transition: transform 0.2s;
-}
-
-details[open] summary::before {
-	transform: rotate(90deg);
-}
-
-details[open] summary {
-	border-bottom: 1px solid #aaa;
-}
-
-details[open] summary ~ * {
-	animation: fade-in 1s ease-in;
-}
-
-@keyframes fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: var(--opacity);	/* Needs a var so the text doesn't flash if details[open] + .finished-event */
-	}
-}
-
 .card-tags {
 	display: flex;
 	flex-flow: row wrap;
-	padding-top: 20px;
 }
 
 .tag {
@@ -325,9 +217,124 @@ details[open] summary ~ * {
 	--theme: seagreen;
 }
 
+@media (width >= 400px) {
+	.card-title {
+		font-size: 20px;
+	}
+}
+
+@media (width >= 600px) {
+	.card-title {
+		text-align: left;
+		text-wrap: wrap;
+	}
+
+}
+
+
+/* ---- Aside ---- */
+.portrait {
+	width: 120px;
+	height: 120px;
+	margin-bottom: 20px;
+	background: #ccc center 20%/120px no-repeat;
+	border-radius: 50%;
+	border: 2px solid var(--accent-light);
+}
+
+.card-button {
+	padding: 20px 30px;
+	border: none;
+	border-radius: 22px;
+	color: black;
+	font-weight: bold;
+	text-decoration: none;
+	line-height: 4px;
+	transition: transform 0.2s;
+}
+
+.card-button:hover {
+	color: white;
+}
+
+.card-button:active {
+	outline: 0;
+	transform: scale(0.95);
+}
+
+.button-event {
+	background-color: var(--accent-light);
+}
+
+.button-recording {
+	background-color: #aaa;
+}
+
+.button-recording:hover {
+	background-color: var(--accent-light);
+}
+
+@media (width >= 600px) {
+	.card-button {
+		min-width: unset;
+	}
+}
+
+
+/* ---- Summary ---- */
+summary {
+	display: flex;
+	padding-bottom: 10px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+summary::before {
+	content: "\2B9E";
+	display: inline-block;
+	margin-right: 10px;
+	transition: transform 0.2s;
+}
+
+details {
+	display: none;
+}
+
+details[open] {
+	display: unset;
+}
+
+details[open] summary::before {
+	transform: rotate(90deg);
+}
+
+details[open] summary {
+	border-bottom: 1px solid #aaa;
+}
+
+details[open] summary ~ * {
+	animation: fade-in 1s ease-in;
+}
+
+details[open] div {
+	padding: 5px 10px;
+	color: #aaa;
+	text-align: justify;
+	text-justify: inter-word;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: var(--opacity);	/* Needs a var so the text doesn't flash if details[open] + .finished-event */
+	}
+}
+
 
 /* ---- Finished event ---- */
-.finished-event :is(.card-date, .card-info, .card-audience) * {
+.finished-event :is(.card-date, .card-info, .card-summary) * {
 	--opacity: 0.5;
 	opacity: var(--opacity);
 }
