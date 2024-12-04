@@ -1,9 +1,9 @@
-function generateEvent(container, date, title, summary, eventLink, recordingLink, tags, gerundio) {
+function generateEvent(eventsList, date, title, summary, eventLink, recordingLink, tags, gerundio) {
 
 	// Create card row and set attributes
 	const cardRow = createElementWithClasses("div", "card-row");
-	cardRow.setAttribute("data-tags", tags.join(","));
-	cardRow.setAttribute("gerundio-tags", gerundio);
+	cardRow.setAttribute("field-tag", tags.join(","));
+	cardRow.setAttribute("gerundio-tag", gerundio);
 
 	// Hidden date input
 	const hiddenDate = document.createElement("input");
@@ -14,7 +14,6 @@ function generateEvent(container, date, title, summary, eventLink, recordingLink
 	// Card date and card main content
 	const cardDate = createCardDate(date);
 	const cardMain = createElementWithClasses("div", "card-main");
-	appendAnimations(cardMain);
 
 	// Card info section
 	const cardInfo = createElementWithClasses("div", "card-info");
@@ -35,7 +34,7 @@ function generateEvent(container, date, title, summary, eventLink, recordingLink
 	// Append content to row and insert event in container
 	cardRow.appendChild(cardDate);
 	cardRow.appendChild(cardMain);
-	insertEventInOrder(container, cardRow, new Date(date));
+	insertEventInOrder(eventsList, cardRow, new Date(date));
 }
 
 function createElementWithClasses(tag, ...classes) {
@@ -60,15 +59,6 @@ function createCardDate(date) {
 	cardDate.appendChild(monthElement);
 
 	return cardDate;
-}
-
-function appendAnimations(container) {
-	const fragment = document.createDocumentFragment();
-	["anim-right", "anim-bottom", "anim-left", "anim-top"].forEach(anim => {
-		// Minimize reflows by appending all spans to a temporary container first
-		fragment.appendChild(createElementWithClasses("span", anim));
-	});
-	container.appendChild(fragment);
 }
 
 function createCardTitle(title) {
@@ -108,7 +98,7 @@ function createTagDiv(tags, gerundio) {
 
 // Set portrait image path by matching filename with guest name and surname extracted from the card summary beginning
 // E.g. "John Doe, renowned professor at..." => Path must be "img/portrait/john_doe"
-// File extension must be .jpeg
+// File extension must be one from the array below
 function createPortrait(summary) {
 	// Remove accents from guest name
 	function removeDiacritics(str) {
@@ -117,7 +107,26 @@ function createPortrait(summary) {
 
 	const portrait = createElementWithClasses("div", "portrait");
 	const guestName = removeDiacritics(summary.split(/[\s,]+/).slice(0, 2).join("_")).toLowerCase();
-	portrait.style.backgroundImage = `url(img/portrait/${guestName}.jpeg)`;
+	const extensions = ["jpeg", "jpg", "png"];
+	let fileFound = false;
+
+	for (let ext of extensions) {
+		const filePath = `img/portrait/${guestName}.${ext}`;
+
+		// Create new Image object to check if file exists
+		const img = new Image();
+		img.src = filePath;
+
+		img.onload = function() {
+			// If image loads, set background image
+			portrait.style.backgroundImage = `url(${filePath})`;
+			fileFound = true;
+		};
+
+		if (fileFound) {
+			break;
+		}
+	}
 
 	return portrait;
 }
@@ -160,11 +169,11 @@ function styleEventByDate(cardRow, cardMain, date) {
 	}
 }
 
-function insertEventInOrder(container, newEvent, newEventDate) {
-	const events = container.querySelectorAll(".card-row");
+function insertEventInOrder(eventsList, newEvent, newEventDate) {
+	const events = eventsList.querySelectorAll(".card-row");
 
 	if (events.length === 0) {
-		container.appendChild(newEvent);
+		eventsList.appendChild(newEvent);
 
 		return;
 	}
@@ -174,22 +183,22 @@ function insertEventInOrder(container, newEvent, newEventDate) {
 		const currentEventDate = new Date(currentEvent.querySelector("input[type='hidden']").value);
 
 		if (newEventDate < currentEventDate) {
-			container.insertBefore(newEvent, currentEvent.nextSibling);
+			eventsList.insertBefore(newEvent, currentEvent.nextSibling);
 
 			return;
 		}
 	}
-	container.insertBefore(newEvent, container.firstChild);
+	eventsList.insertBefore(newEvent, eventsList.firstChild);
 }
 
-function populateComboBox(container) {
-	const events = container.querySelectorAll(".card-row");
+function populateComboBox(eventsList) {
+	const events = eventsList.querySelectorAll(".card-row");
 	const tagsSet = new Set();
 	const gerundioTagsSet = new Set();
 
 	events.forEach(event => {
-		const tags = event.getAttribute("data-tags");
-		const gerundioTags = event.getAttribute("gerundio-tags");
+		const tags = event.getAttribute("field-tag");
+		const gerundioTags = event.getAttribute("gerundio-tag");
 
 		if (tags) tags.split(",").forEach(tag => tagsSet.add(tag.trim()));
 		if (gerundioTags) gerundioTags.split(",").forEach(tag => gerundioTagsSet.add(tag.trim()));
@@ -222,8 +231,8 @@ function filterEvents() {
 
 	// Display events based on selected filter
 	events.forEach(event => {
-		const eventTags = event.getAttribute("data-tags").split(",");
-		const eventGerundioTags = event.getAttribute("gerundio-tags").split(",");
+		const eventTags = event.getAttribute("field-tag").split(",");
+		const eventGerundioTags = event.getAttribute("gerundio-tag").split(",");
 
 		const displayEvent = (eventTags.includes(selectedValue) || eventGerundioTags.includes(selectedValue) || selectedValue === "All");
 		event.style.display = displayEvent ? "flex" : "none";

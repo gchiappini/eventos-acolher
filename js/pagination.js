@@ -2,12 +2,12 @@
 const itemsPerPage = 10;
 let pageCurrent = 1;
 
-// Function to control card visibility based on current page
+// Control card visibility based on current page
 function paginate() {
 	const allRows = document.querySelectorAll(".card-row");
 	const totalItems = allRows.length;
 
-	// Calculate the start/end index for current page
+	// Calculate start/end index for current page
 	const startIndex = (pageCurrent - 1) * itemsPerPage;
 	const endIndex = startIndex + itemsPerPage;
 
@@ -18,23 +18,23 @@ function paginate() {
 		if (rowHide) {
 			row.style.display = "none";
 		} else {
-			row.removeAttribute("style"); // Clear inline styling
+			row.removeAttribute("style");
 		}
 	});
 
 	// Update buttons based on current page
 	const btnPrev = document.getElementById("btn-prev");
 	if (pageCurrent === 1) {
-		btnHide(btnPrev); // Hide if on first page
+		btnHide(btnPrev); // Hide if first page
 	} else {
-		btnShow(btnPrev); // Show if not on first page
+		btnShow(btnPrev);
 	}
 
 	const btnNext = document.getElementById("btn-next");
 	if (pageCurrent * itemsPerPage >= totalItems) {
-		btnHide(btnNext); // Hide if on last page
+		btnHide(btnNext); // Hide if last page
 	} else {
-		btnShow(btnNext); // Show if more pages are available
+		btnShow(btnNext);
 	}
 }
 
@@ -55,6 +55,7 @@ document.getElementById("btn-prev").addEventListener("click", () => {
 	if (pageCurrent > 1) {
 		pageCurrent--;
 		paginate();
+		restorePageView();
 	}
 });
 
@@ -63,7 +64,16 @@ document.getElementById("btn-next").addEventListener("click", () => {
 	if (pageCurrent * itemsPerPage < allRows.length) {
 		pageCurrent++;
 		paginate();
+		restorePageView();
 	}
 });
+
+// Reset position to continue browsing
+function restorePageView() {
+	const eventsList = document.getElementById("events-container");
+	if (eventsList) {
+		eventsList.scrollIntoView({ behavior: "smooth", block: "start" });
+	}
+}
 
 paginate();
