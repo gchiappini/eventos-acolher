@@ -7,6 +7,9 @@ function replaceMonth() {
 		const month = monthElement.textContent.trim();
 		// Convert to zero-based index
 		const monthIndex = parseInt(month, 10) - 1;
+
+		// Invalid entry fallback
+		monthElement.textContent = monthAbbreviations[monthIndex]?? "ERRO";
 	});
 }
 
